@@ -160,11 +160,12 @@ class Object:
     def duplicate(self, name):
         """makes a deep copy of the object"""
         template_ob = self.selectObjectByName(name)
+
         if template_ob:
             self._globalCounter += 1
             newname = "%s-%s" % (template_ob.name, self._globalCounter)
             ob = self._D.objects.new(newname, template_ob.data)
-            # copy the date
+            # copy the data
             ob.data = template_ob.data.copy()
             # ob = template_ob.copy() not a full copy
             return ob
@@ -188,3 +189,19 @@ class Object:
         # vertex.co  -> local vertex coordinate
         # global vertex coordinates
         return obj.matrix_world @ vertex.co
+
+    def addMaterial(self, obj, matname):
+        """ assign a material to the object, or create new one """
+        # Get material
+        mat = bpy.data.materials.get(matname)
+        if mat is None:
+            # create material
+            mat = bpy.data.materials.new(name="Material")
+
+        # Assign it to object
+        if obj.data.materials:
+            # assign to 1st material slot
+            obj.data.materials[0] = mat
+        else:
+            # no slots
+            obj.data.materials.append(mat)
